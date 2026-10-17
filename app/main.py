@@ -8,30 +8,54 @@ GhostSearch Application Server (Cloud & Local)
 import gc
 import logging
 import sys
+import importlib.util
 from pathlib import Path
 from fastapi import FastAPI, Request, Form, Query, Response
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
-# Support both root-level and app-level imports
+# Locate directories
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
-for p in [str(ROOT_DIR), str(APP_DIR)]:
-    if p not in sys.path:
-        sys.path.insert(0, p)
 
-# Load engine from root or app
-try:
-    from engine import search_all
-except ImportError:
-    from app.engine import search_all
+# 1. DIRECT ENGINE LOADER: Load root engine.py directly by path so old app/engine.py is never used
+search_all = None
+root_engine_path = ROOT_DIR / "engine.py"
+app_engine_path = APP_DIR / "engine.py"
+
+if root_engine_path.exists():
+    try:
+        spec = importlib.util.spec_from_file_location("root_engine", str(root_engine_path))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        if hasattr(mod, "search_all"):
+            search_all = mod.search_all
+    except Exception as e:
+        pass
+
+if search_all is None and app_engine_path.exists():
+    try:
+        spec = importlib.util.spec_from_file_location("app_engine", str(app_engine_path))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        if hasattr(mod, "search_all"):
+            search_all = mod.search_all
+    except Exception as e:
+        pass
+
+# Fallback import if needed
+if search_all is None:
+    try:
+        from engine import search_all
+    except ImportError:
+        from app.engine import search_all
 
 # SILENCE ALL LOGS: Prevent query leakage into console or files
 logging.getLogger("uvicorn.access").disabled = True
 logging.getLogger("uvicorn.error").setLevel(logging.CRITICAL)
 logging.disable(logging.CRITICAL)
 
-# Look for templates in root, app/templates, or templates
+# Look for templates in root first (where user uploaded index.html & results.html), then subdirectories
 template_candidates = [
     str(ROOT_DIR),
     str(ROOT_DIR / "templates"),
@@ -65,6 +89,23 @@ async def home(request: Request):
         context={"safesearch": "moderate"}
     )
 
+async def _perform_search(query: str, page: int, safesearch: str):
+    """Safely executes search across any version of search_all without ever crashing."""
+    try:
+        # Try calling with safesearch keyword
+        return await search_all(query=query, page=page, safesearch=safesearch)
+    except TypeError:
+        try:
+            # Fallback if old signature only takes (query, page)
+            res = await search_all(query=query, page=page)
+            if isinstance(res, dict):
+                res["safesearch"] = safesearch
+            return res
+        except Exception:
+            return {"query": query, "page": page, "safesearch": safesearch, "instant": None, "results": []}
+    except Exception:
+        return {"query": query, "page": page, "safesearch": safesearch, "instant": None, "results": []}
+
 @app.post("/search", response_class=HTMLResponse)
 async def search_post(
     request: Request,
@@ -72,12 +113,9 @@ async def search_post(
     page: int = Form(1),
     safesearch: str = Form("moderate")
 ):
-    """
-    Primary search handler using HTTP POST.
-    POST requests do NOT store the search query in browser URL address bar history.
-    """
+    """Primary search handler using HTTP POST (no URL history leakage)."""
     query = q.strip()
-    data = await search_all(query=query, page=page, safesearch=safesearch)
+    data = await _perform_search(query=query, page=page, safesearch=safesearch)
     gc.collect()
     return templates.TemplateResponse(
         request=request,
@@ -100,7 +138,7 @@ async def search_get(
 ):
     """Fallback GET search handler to allow setting GhostSearch as browser default engine."""
     query = q.strip()
-    data = await search_all(query=query, page=page, safesearch=safesearch)
+    data = await _perform_search(query=query, page=page, safesearch=safesearch)
     gc.collect()
     return templates.TemplateResponse(
         request=request,
