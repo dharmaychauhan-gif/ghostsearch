@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GhostSearch</title>
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --border-color: #334155;
+            --link-title: #60a5fa;
+            --link-url: #34d399;
+            --danger-bg: #7f1d1d;
+            --danger-text: #fca5a5;
+            --danger-hover: #991b1b;
+        }
+
+        body.light-mode {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #0284c7;
+            --accent-hover: #0369a1;
+            --border-color: #e2e8f0;
+            --link-title: #1d4ed8;
+            --link-url: #059669;
+            --danger-bg: #fee2e2;
+            --danger-text: #991b1b;
+            --danger-hover: #fecaca;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 16px 28px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex: 1;
+            max-width: 850px;
+        }
+
+        .logo-small {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-decoration: none;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+
+        .search-form-header {
+            flex: 1;
+        }
+
+        .search-box-header {
+            display: flex;
+            align-items: center;
+            background: var(--bg-color);
+            border: 1.5px solid var(--border-color);
+            border-radius: 24px;
+            padding: 6px 14px 6px 18px;
+        }
+
+        .search-box-header:focus-within {
+            border-color: var(--accent);
+        }
+
+        .search-input-header {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-main);
+            font-size: 0.98rem;
+        }
+
+        .search-btn-header {
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            border-radius: 16px;
+            padding: 6px 14px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .purge-btn {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+            border: 1px solid transparent;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .purge-btn:hover {
+            background: var(--danger-hover);
+        }
+
+        .theme-toggle-header {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 7px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .main-content {
+            padding: 24px 28px;
+            max-width: 820px;
+            margin-left: 140px;
+            flex: 1;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                margin-left: auto;
+                margin-right: auto;
+                padding: 16px;
+            }
+            .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+
+        .security-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        /* Instant Answer Card */
+        .instant-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 26px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .instant-img {
+            max-width: 110px;
+            max-height: 110px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .instant-content {
+            flex: 1;
+        }
+
+        .instant-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .instant-abstract {
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .instant-source {
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Search Results */
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .result-url {
+            font-size: 0.82rem;
+            color: var(--link-url);
+            word-break: break-all;
+            text-decoration: none;
+        }
+
+        .result-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--link-title);
+            text-decoration: none;
+            line-height: 1.35;
+        }
+
+        .result-title:hover {
+            text-decoration: underline;
+        }
+
+        .result-snippet {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 36px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .pagination-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .safesearch-group-header {
+            display: inline-flex;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2px;
+            gap: 2px;
+            margin-left: 6px;
+        }
+
+        .safesearch-pill-header {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .safesearch-pill-header input {
+            display: none;
+        }
+
+        .safesearch-pill-header span {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.15s ease;
+        }
+
+        .safesearch-pill-header input:checked + span {
+            background: #0284c7;
+            color: #ffffff;
+        }
+
+        footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <a href="/" class="logo-small">GhostSearch</a>
+            
+            <form class="search-form-header" action="/search" method="POST" autocomplete="off">
+                <input type="hidden" name="safesearch" value="{{ safesearch }}">
+                <div class="search-box-header">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        value="{{ query }}" 
+                        class="search-input-header" 
+                        required 
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <button type="submit" class="search-btn-header">Search</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="header-right">
+            <button class="purge-btn" onclick="purgeMemory()" title="Purges all RAM and temporary buffers">
+                <span>🔥</span> Wipe Session
+            </button>
+            <button class="theme-toggle-header" id="themeBtn" onclick="toggleTheme()">☀️</button>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="security-banner">
+            <span class="security-badge">🛡️ Zero-Logs Enforced</span>
+            <span>&bull;</span>
+            <span>No Disk Storage</span>
+            <span>&bull;</span>
+            <span>{{ results|length }} Organic Results</span>
+            <span>&bull;</span>
+            
+            <!-- SafeSearch selector directly on results page -->
+            <form action="/search" method="POST" id="safesearch-results-form" style="display:inline-flex; align-items:center; gap:4px;">
+                <input type="hidden" name="q" value="{{ query }}">
+                <span style="font-weight:600; color:var(--text-muted); font-size:0.8rem;">SafeSearch:</span>
+                <div class="safesearch-group-header">
+                    <label class="safesearch-pill-header" title="Block all explicit content">
+                        <input type="radio" name="safesearch" value="strict" {% if safesearch == 'strict' %}checked{% endif %} onchange="document.getElementById('safesearch-results-form').submit()">
+                        <span>Strict</span>
+                    </label>
+                    <label class="safesearch-pill-header" title="Block explicit images and videos">
+                        <input type="radio" name="safesearch" value="moderate" {% if safesearch == 'moderate' or not safesearch %}checked{% endif %} onchange="document.getElementById('safesearch-results-form').submit()">
+                        <span>Moderate</span>
+                    </label>
+                    <label class="safesearch-pill-header" title="Uncensored unrestricted results">
+                        <input type="radio" name="safesearch" value="off" {% if safesearch == 'off' %}checked{% endif %} onchange="document.getElementById('safesearch-results-form').submit()">
+                        <span>Off</span>
+                    </label>
+                </div>
+            </form>
+        </div>
+
+        <!-- Instant Knowledge Box -->
+        {% if instant %}
+        <div class="instant-card">
+            {% if instant.image %}
+            <img src="{{ instant.image }}" alt="Thumbnail" class="instant-img" onerror="this.style.display='none'">
+            {% endif %}
+            <div class="instant-content">
+                <h2 class="instant-title">{{ instant.heading }}</h2>
+                <p class="instant-abstract">{{ instant.abstract }}</p>
+                {% if instant.url %}
+                <a href="{{ instant.url }}" target="_blank" rel="noreferrer noopener" class="instant-source">
+                    Read more on {{ instant.source }} &rarr;
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Organic Web Results -->
+        {% if results %}
+        <div class="results-list">
+            {% for r in results %}
+            <div class="result-item">
+                <a href="{{ r.url }}" target="_blank" rel="noreferrer noopener" class="result-url">
+                    {{ r.url }}
+                </a>
+                <a href="{{ r.url }}" target="_blank" rel="noreferrer noopener" class="result-title">
+                    {{ r.title }}
+                </a>
+                <p class="result-snippet">
+                    {{ r.snippet }}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination using POST form to keep search terms out of URLs -->
+        <div class="pagination">
+            {% if page > 1 %}
+            <form action="/search" method="POST" style="display:inline;">
+                <input type="hidden" name="q" value="{{ query }}">
+                <input type="hidden" name="page" value="{{ page - 1 }}">
+                <button type="submit" class="pagination-btn">&larr; Previous</button>
+            </form>
+            {% endif %}
+
+            <span style="font-size: 0.88rem; color: var(--text-muted);">Page {{ page }}</span>
+
+            <form action="/search" method="POST" style="display:inline;">
+                <input type="hidden" name="q" value="{{ query }}">
+                <input type="hidden" name="page" value="{{ page + 1 }}">
+                <button type="submit" class="pagination-btn">Next &rarr;</button>
+            </form>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <p>No results found for your query.</p>
+            <p style="font-size: 0.85rem; margin-top: 8px;">Try refining your keywords or checking your internet connection.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        GhostSearch &bull; Protected under strict zero-trace volatile RAM execution &bull; 127.0.0.1
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            document.getElementById('themeBtn').textContent = isLight ? '🌙' : '☀️';
+        }
+
+        async function purgeMemory() {
+            try {
+                await fetch('/api/purge', { method: 'POST' });
+            } catch(e) {}
+            // Redirect cleanly to root
+            window.location.replace('/');
+        }
+    </script>
+</body>
+</html>
