@@ -4,7 +4,9 @@ GhostSearch Application Server (Cloud & Local)
 - Cloud & Datacenter optimized (Runs reliably on Render, AWS, and local PC)
 - Multi-engine search: Bing (Cloud IP friendly) + DuckDuckGo Lite fallback
 - SafeSearch levels: Strict, Moderate, Off
-- Strips ads, telemetry redirects, and tracking parameters
+- SPA Search API (/api/search) for zero-history in-page searching
+- Ghost Reader Proxy (/api/proxy) for anonymous reading without visiting target sites
+- Full PWA Support (/manifest.json, /sw.js, icons) for 1-Tap Home Screen App Install
 """
 
 import gc
@@ -222,13 +224,15 @@ async def search_all(query: str, page: int = 1, safesearch: str = "moderate") ->
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
 
-# Load templates from root or app/templates
-template_candidates = [
-    str(ROOT_DIR),
-    str(ROOT_DIR / "templates"),
-    str(APP_DIR / "templates"),
-    str(APP_DIR)
-]
+# Smart template loader
+root_idx = ROOT_DIR / "index.html"
+app_idx = APP_DIR / "templates" / "index.html"
+
+if root_idx.exists() and (not app_idx.exists() or root_idx.stat().st_size >= app_idx.stat().st_size):
+    template_candidates = [str(ROOT_DIR), str(APP_DIR / "templates"), str(ROOT_DIR / "templates"), str(APP_DIR)]
+else:
+    template_candidates = [str(APP_DIR / "templates"), str(ROOT_DIR), str(ROOT_DIR / "templates"), str(APP_DIR)]
+
 valid_dirs = [d for d in template_candidates if Path(d).exists()]
 templates = Jinja2Templates(directory=valid_dirs if valid_dirs else str(ROOT_DIR))
 
@@ -247,14 +251,127 @@ async def enforce_zero_storage_headers(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     return response
 
+# PWA MANIFEST & SERVICE WORKER
+@app.get("/manifest.json")
+async def get_manifest():
+    return JSONResponse(
+        content={
+            "name": "GhostSearch",
+            "short_name": "GhostSearch",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#0b1120",
+            "theme_color": "#0b1120",
+            "description": "100% In-Memory Private Search Engine",
+            "icons": [
+                {
+                    "src": "/icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                },
+                {
+                    "src": "/icon-512.png",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                }
+            ]
+        },
+        headers={"Content-Type": "application/manifest+json"}
+    )
+
+@app.get("/sw.js")
+async def get_sw():
+    js_content = "self.addEventListener('install', (e) => { self.skipWaiting(); });\nself.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });\nself.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request)); });"
+    return Response(content=js_content, media_type="application/javascript")
+
+@app.get("/icon-192.png")
+async def get_icon_192():
+    for base in [ROOT_DIR, APP_DIR]:
+        p = base / "icon-192.png"
+        if p.exists():
+            return Response(content=p.read_bytes(), media_type="image/png")
+    return Response(status_code=404)
+
+@app.get("/icon-512.png")
+async def get_icon_512():
+    for base in [ROOT_DIR, APP_DIR]:
+        p = base / "icon-512.png"
+        if p.exists():
+            return Response(content=p.read_bytes(), media_type="image/png")
+    return Response(status_code=404)
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     """Renders the minimalist, zero-storage home search interface."""
     return templates.TemplateResponse(
         request=request, 
         name="index.html",
-        context={"safesearch": "moderate"}
+        context={"safesearch": "moderate", "results": None, "query": "", "instant": None}
     )
+
+@app.get("/api/search")
+async def api_search(
+    q: str = Query(""),
+    page: int = Query(1),
+    safesearch: str = Query("moderate")
+):
+    """JSON search endpoint for Single-Page In-Place searches (zero browser history navigation)."""
+    query = q.strip()
+    try:
+        data = await search_all(query=query, page=page, safesearch=safesearch)
+    except Exception:
+        data = {"query": query, "page": page, "safesearch": safesearch, "instant": None, "results": []}
+
+    gc.collect()
+    return JSONResponse(content=data)
+
+@app.get("/api/proxy")
+async def api_proxy(url: str = Query("")):
+    """
+    Ghost Reader Proxy:
+    Anonymously extracts readable text from destination URLs.
+    Allows user to read articles without their browser connecting to or logging the site!
+    """
+    target = url.strip()
+    if not target.startswith("http://") and not target.startswith("https://"):
+        return JSONResponse(status_code=400, content={"error": "Invalid URL protocol"})
+
+    try:
+        headers = {
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        }
+        async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
+            resp = await client.get(target, headers=headers)
+            if resp.status_code != 200:
+                return JSONResponse(content={"error": f"Target server returned HTTP {resp.status_code}"})
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+            for bad in soup(["script", "style", "nav", "footer", "aside", "iframe", "form", "noscript", "svg"]):
+                bad.decompose()
+
+            article = soup.find("article") or soup.find("main") or soup.find("body")
+            paragraphs = []
+            if article:
+                for el in article.find_all(["p", "h2", "h3", "li"]):
+                    txt = el.get_text(strip=True)
+                    if len(txt) > 35 and txt not in paragraphs:
+                        paragraphs.append(txt)
+
+            title = soup.title.get_text(strip=True) if soup.title else "Web Article"
+            domain = urllib.parse.urlparse(target).netloc
+            gc.collect()
+            return JSONResponse(content={
+                "status": "success",
+                "title": title,
+                "domain": domain,
+                "url": target,
+                "paragraphs": paragraphs[:25]
+            })
+    except Exception as e:
+        return JSONResponse(content={"error": f"Failed to retrieve reader content: {str(e)}"})
 
 @app.post("/search", response_class=HTMLResponse)
 async def search_post(
@@ -263,7 +380,7 @@ async def search_post(
     page: int = Form(1),
     safesearch: str = Form("moderate")
 ):
-    """Primary search handler using HTTP POST (no URL history leakage)."""
+    """Traditional POST fallback (for browsers with JS disabled)."""
     query = q.strip()
     try:
         data = await search_all(query=query, page=page, safesearch=safesearch)
@@ -273,7 +390,7 @@ async def search_post(
     gc.collect()
     return templates.TemplateResponse(
         request=request,
-        name="results.html",
+        name="index.html",
         context={
             "query": data.get("query", query),
             "page": data.get("page", page),
@@ -300,7 +417,7 @@ async def search_get(
     gc.collect()
     return templates.TemplateResponse(
         request=request,
-        name="results.html",
+        name="index.html",
         context={
             "query": data.get("query", query),
             "page": data.get("page", page),
