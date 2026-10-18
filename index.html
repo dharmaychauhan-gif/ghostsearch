@@ -2,43 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GhostSearch | 100% Private Search Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="page-title">GhostSearch</title>
+    <link rel="icon" id="page-favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
+    <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="referrer" content="no-referrer">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <style>
         :root {
-            --bg-color: #0f172a;
+            --bg-color: #0b1120;
+            --header-bg: #0f172a;
             --card-bg: #1e293b;
+            --card-hover: #24324a;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --accent: #38bdf8;
             --accent-hover: #0284c7;
             --border-color: #334155;
-            --shield-bg: #064e3b;
-            --shield-text: #34d399;
+            --danger-bg: #450a0a;
+            --danger-text: #fca5a5;
+            --danger-hover: #7f1d1d;
+            --ghost-btn-bg: #1e1b4b;
+            --ghost-btn-text: #a5b4fc;
+            --ghost-btn-hover: #312e81;
+            --link-title: #38bdf8;
+            --link-url: #34d399;
         }
 
         body.light-mode {
             --bg-color: #f8fafc;
+            --header-bg: #ffffff;
             --card-bg: #ffffff;
+            --card-hover: #f1f5f9;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --accent: #0284c7;
             --accent-hover: #0369a1;
             --border-color: #e2e8f0;
-            --shield-bg: #ecfdf5;
-            --shield-text: #059669;
+            --danger-bg: #fef2f2;
+            --danger-text: #dc2626;
+            --danger-hover: #fee2e2;
+            --ghost-btn-bg: #e0e7ff;
+            --ghost-btn-text: #4338ca;
+            --ghost-btn-hover: #c7d2fe;
+            --link-title: #0369a1;
+            --link-url: #059669;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -47,94 +65,163 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            transition: background 0.2s, color 0.2s;
         }
 
-        header {
-            padding: 20px 30px;
+        /* Top Stealth Toolbar */
+        .top-nav {
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 16px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .badge-pill {
-            display: inline-flex;
+        .nav-brand {
+            display: flex;
             align-items: center;
             gap: 8px;
-            background-color: var(--shield-bg);
-            color: var(--shield-text);
-            padding: 6px 14px;
-            border-radius: 9999px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            letter-spacing: 0.3px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--accent);
+            text-decoration: none;
+            cursor: pointer;
         }
 
-        .theme-toggle {
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-stealth {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 0.85rem;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
+            transition: all 0.15s;
         }
 
-        .theme-toggle:hover {
+        .btn-stealth:hover {
             border-color: var(--accent);
         }
 
-        main {
+        .btn-panic {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+            border: 1px solid var(--danger-hover);
+        }
+
+        .btn-panic:hover {
+            background: var(--danger-hover);
+            color: #fff;
+        }
+
+        /* Disguise Menu Modal */
+        .disguise-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 200;
+            min-width: 190px;
+        }
+
+        .disguise-option {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .disguise-option:hover {
+            background: var(--card-hover);
+            color: var(--accent);
+        }
+
+        /* Container Layouts */
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Home Hero Mode */
+        .hero-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 0 20px;
-            margin-top: -60px;
-        }
-
-        .logo-container {
+            min-height: 60vh;
             text-align: center;
-            margin-bottom: 28px;
+            padding: 20px 0;
+            transition: all 0.3s ease;
         }
 
-        .logo-title {
-            font-size: 3.2rem;
+        .hero-title {
+            font-size: 2.8rem;
             font-weight: 800;
-            letter-spacing: -1.5px;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
             background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .logo-subtitle {
+        .hero-subtitle {
+            font-size: 0.95rem;
             color: var(--text-muted);
-            font-size: 1rem;
-            margin-top: 6px;
+            margin-bottom: 30px;
+            max-width: 520px;
         }
 
-        .search-form {
+        /* Search Form */
+        .search-box-wrapper {
             width: 100%;
             max-width: 650px;
-            position: relative;
-        }
-
-        .search-box-wrapper {
-            display: flex;
-            align-items: center;
             background: var(--card-bg);
             border: 2px solid var(--border-color);
-            border-radius: 28px;
-            padding: 8px 16px 8px 22px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            padding: 6px 14px 6px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
         }
 
         .search-box-wrapper:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
         }
 
         .search-input {
@@ -142,70 +229,44 @@
             background: transparent;
             border: none;
             outline: none;
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             color: var(--text-main);
             padding: 8px 0;
         }
 
-        .search-input::placeholder {
-            color: var(--text-muted);
-        }
-
         .search-btn {
             background: var(--accent);
-            color: #0f172a;
+            color: #0b1120;
             border: none;
-            border-radius: 20px;
+            border-radius: 22px;
             padding: 10px 22px;
-            font-weight: 700;
             font-size: 0.95rem;
+            font-weight: 700;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            transition: all 0.15s;
         }
 
         .search-btn:hover {
             background: var(--accent-hover);
-            color: #ffffff;
         }
 
-        .privacy-features {
-            display: flex;
-            gap: 20px;
-            margin-top: 32px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .feature-icon {
-            color: var(--accent);
-            font-size: 1.1rem;
-        }
-
+        /* SafeSearch Toggle */
         .safesearch-box {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             margin-top: 18px;
+            flex-wrap: wrap;
         }
 
         .safesearch-label {
+            font-size: 0.85rem;
             color: var(--text-muted);
-            font-size: 0.88rem;
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        .safesearch-group {
+        .safesearch-pills {
             display: inline-flex;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -216,7 +277,6 @@
 
         .safesearch-pill {
             cursor: pointer;
-            user-select: none;
         }
 
         .safesearch-pill input {
@@ -234,118 +294,639 @@
         }
 
         .safesearch-pill input:checked + span {
-            background: #0284c7;
-            color: #ffffff;
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+            background: var(--accent);
+            color: #0b1120;
         }
 
-        footer {
-            padding: 24px;
-            text-align: center;
+        /* Results View (Hidden Initially) */
+        .results-section {
+            display: none;
+            width: 100%;
+        }
+
+        .security-badge-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             font-size: 0.82rem;
             color: var(--text-muted);
+            padding: 10px 0 16px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .security-tags {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag-green {
+            color: #34d399;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Instant Answer Box */
+        .instant-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        .instant-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .instant-abstract {
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        /* Results List */
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .result-top-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .result-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--link-title);
+            text-decoration: none;
+            line-height: 1.35;
+        }
+
+        .result-title:hover {
+            text-decoration: underline;
+        }
+
+        .ghost-view-btn {
+            background: var(--ghost-btn-bg);
+            color: var(--ghost-btn-text);
+            border: 1px solid rgba(165, 180, 252, 0.3);
+            border-radius: 8px;
+            padding: 5px 11px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s;
+        }
+
+        .ghost-view-btn:hover {
+            background: var(--ghost-btn-hover);
+        }
+
+        .result-url {
+            font-size: 0.8rem;
+            color: var(--link-url);
+            word-break: break-all;
+            text-decoration: none;
+        }
+
+        .result-snippet {
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        /* Loading Skeleton */
+        .loading-state {
+            display: none;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 14px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Ghost Reader Modal */
+        .reader-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .reader-content-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 760px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .reader-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--header-bg);
+        }
+
+        .reader-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #34d399;
+        }
+
+        .reader-close-btn {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .reader-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+            line-height: 1.7;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .reader-body p {
+            margin-bottom: 16px;
+        }
+
+        .reader-article-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .reader-source-link {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
             border-top: 1px solid var(--border-color);
+            margin-top: auto;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="badge-pill">
-            <span>🛡️</span> Zero-Storage Architecture Active
-        </div>
-        <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">
-            <span id="themeIcon">☀️</span> <span id="themeText">Light Mode</span>
-        </button>
-    </header>
+    <!-- Top Stealth Bar -->
+    <header class="top-nav">
+        <a class="nav-brand" onclick="resetToHome()">
+            <span>👻</span>
+            <span id="nav-brand-text">GhostSearch</span>
+        </a>
 
-    <main>
-        <div class="logo-container">
-            <h1 class="logo-title">GhostSearch</h1>
-            <p class="logo-subtitle">Full Web Index &bull; Zero Logs &bull; Zero Cookies &bull; RAM-Only</p>
-        </div>
+        <div class="nav-actions">
+            <!-- Camouflage / Disguise Button -->
+            <button class="btn-stealth" onclick="toggleDisguiseMenu()" title="Camouflage Tab Title & Icon in Browser History">
+                <span>🎭</span> Disguise
+            </button>
 
-        <!-- POST method prevents search terms from leaking into browser URL address bar history -->
-        <form class="search-form" action="/search" method="POST" autocomplete="off">
-            <div class="search-box-wrapper">
-                <input 
-                    type="text" 
-                    name="q" 
-                    class="search-input" 
-                    placeholder="Search the web freely without being tracked..." 
-                    autofocus 
-                    required 
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-                <button type="submit" class="search-btn">
-                    <span>Search</span>
-                </button>
+            <!-- Disguise Selector Dropdown -->
+            <div class="disguise-dropdown" id="disguiseMenu">
+                <button class="disguise-option" onclick="applyDisguise('ghost')">👻 GhostSearch (Default)</button>
+                <button class="disguise-option" onclick="applyDisguise('google')">🔍 Google (Stealth)</button>
+                <button class="disguise-option" onclick="applyDisguise('newtab')">📄 New Tab</button>
+                <button class="disguise-option" onclick="applyDisguise('wiki')">📖 Wikipedia</button>
             </div>
 
-            <!-- SafeSearch Segmented Control: Strict / Moderate / Off -->
+            <!-- Wipe RAM Button -->
+            <button class="btn-stealth" onclick="wipeSession()" title="Purges all session buffers">
+                <span>🔥</span> Wipe
+            </button>
+
+            <!-- Emergency Panic Button -->
+            <button class="btn-stealth btn-panic" onclick="panicExit()" title="Emergency Exit: Overwrites page with Google and leaves zero history">
+                <span>⚡</span> Panic
+            </button>
+
+            <!-- Theme Toggle -->
+            <button class="btn-stealth" onclick="toggleTheme()" id="themeBtn">🌙</button>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <!-- Hero Section (Home State) -->
+        <section class="hero-section" id="heroSection">
+            <h1 class="hero-title">GhostSearch</h1>
+            <p class="hero-subtitle">
+                100% In-Memory Private Search. Zero Logs. Zero Disk Storage. Single-Page Architecture ensures your searches never create browser history entries.
+            </p>
+
+            <form class="search-box-wrapper" onsubmit="handleSearch(event)">
+                <input 
+                    type="text" 
+                    id="searchInputHero" 
+                    class="search-input" 
+                    placeholder="Search the web freely without tracking..." 
+                    autocomplete="off" 
+                    autocorrect="off" 
+                    autocapitalize="off" 
+                    spellcheck="false" 
+                    data-lpignore="true" 
+                    required 
+                    autofocus
+                >
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+
             <div class="safesearch-box">
                 <span class="safesearch-label">SafeSearch:</span>
-                <div class="safesearch-group">
+                <div class="safesearch-pills">
                     <label class="safesearch-pill">
-                        <input type="radio" name="safesearch" value="strict">
-                        <span id="label-strict">Strict</span>
+                        <input type="radio" name="safesearch" value="strict" onchange="syncSafeSearch('strict')">
+                        <span>Strict</span>
                     </label>
                     <label class="safesearch-pill">
-                        <input type="radio" name="safesearch" value="moderate" checked>
-                        <span id="label-moderate">✓ Moderate</span>
+                        <input type="radio" name="safesearch" value="moderate" checked onchange="syncSafeSearch('moderate')">
+                        <span>Moderate</span>
                     </label>
                     <label class="safesearch-pill">
-                        <input type="radio" name="safesearch" value="off">
-                        <span id="label-off">Off</span>
+                        <input type="radio" name="safesearch" value="off" onchange="syncSafeSearch('off')">
+                        <span>Off</span>
                     </label>
                 </div>
             </div>
-        </form>
+        </section>
 
-        <div class="privacy-features">
-            <div class="feature-item">
-                <span class="feature-icon">🚫</span>
-                <span>No IP Tracking</span>
-            </div>
-            <div class="feature-item">
-                <span class="feature-icon">🧠</span>
-                <span>Volatile RAM Execution</span>
-            </div>
-            <div class="feature-item">
-                <span class="feature-icon">🔒</span>
-                <span>No Outbound Referrers</span>
-            </div>
-            <div class="feature-item">
-                <span class="feature-icon">🧹</span>
-                <span>Adverts & Trackers Stripped</span>
-            </div>
+        <!-- Loading State -->
+        <div class="loading-state" id="loadingState">
+            <div class="spinner"></div>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Fetching clean, ad-free organic results...</p>
         </div>
+
+        <!-- In-Place Results Section -->
+        <section class="results-section" id="resultsSection">
+            
+            <!-- Compact Search Bar in Results Header -->
+            <form class="search-box-wrapper" style="max-width: 100%; margin-bottom: 20px;" onsubmit="handleSearch(event)">
+                <input 
+                    type="text" 
+                    id="searchInputResults" 
+                    class="search-input" 
+                    placeholder="Search query..." 
+                    autocomplete="off" 
+                    autocorrect="off" 
+                    autocapitalize="off" 
+                    spellcheck="false" 
+                    data-lpignore="true" 
+                    required
+                >
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+
+            <div class="security-badge-bar">
+                <div class="security-tags">
+                    <span class="tag-green">🔒 Zero-Logs Enforced</span>
+                    <span>&bull;</span>
+                    <span>RAM Execution</span>
+                    <span>&bull;</span>
+                    <span id="resultsCountBadge">0 Organic Results</span>
+                </div>
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);" id="currentSafeSearchBadge">SafeSearch: Moderate</span>
+                </div>
+            </div>
+
+            <!-- Instant Knowledge Box -->
+            <div class="instant-box" id="instantBox">
+                <h3 class="instant-title" id="instantTitle"></h3>
+                <p class="instant-abstract" id="instantAbstract"></p>
+                <a href="#" target="_blank" rel="noreferrer noopener" class="result-url" id="instantLink">Source</a>
+            </div>
+
+            <!-- Organic Web Results -->
+            <div class="results-list" id="resultsList"></div>
+
+            <!-- Empty State -->
+            <div id="emptyState" style="display:none; text-align:center; padding: 40px 0; color: var(--text-muted);">
+                <p>No results found for your query.</p>
+                <p style="font-size:0.85rem; margin-top:8px;">Try refining your keywords or checking your internet connection.</p>
+            </div>
+        </section>
+
     </main>
 
+    <!-- Ghost View Reader Modal -->
+    <div class="reader-modal" id="readerModal">
+        <div class="reader-content-box">
+            <div class="reader-header">
+                <div class="reader-badge">
+                    <span>👁️</span> Ghost View &bull; 100% Client-Isolated Reader
+                </div>
+                <button class="reader-close-btn" onclick="closeGhostView()">✕ Close</button>
+            </div>
+            <div class="reader-body" id="readerBody">
+                <h2 class="reader-article-title" id="readerTitle">Loading article...</h2>
+                <span class="reader-source-link" id="readerDomain"></span>
+                <div id="readerParagraphs">
+                    <div class="spinner" style="margin-top: 30px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
-        GhostSearch Engine &bull; Strictly Local to 127.0.0.1 &bull; No queries or data are written to disk.
+        GhostSearch &bull; Protected under strict zero-trace volatile RAM execution &bull; 127.0.0.1
     </footer>
 
     <script>
-        function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('light-mode');
-            const isLight = body.classList.contains('light-mode');
-            document.getElementById('themeIcon').textContent = isLight ? '🌙' : '☀️';
-            document.getElementById('themeText').textContent = isLight ? 'Dark Mode' : 'Light Mode';
+        let currentSafeSearch = 'moderate';
+        let currentQuery = '';
+
+        // Anti-History Guarantee: Ensure browser address bar never keeps /search in history
+        if (window.location.pathname !== '/') {
+            window.history.replaceState(null, '', '/');
         }
 
-        // Update checkmark on SafeSearch toggle
-        document.querySelectorAll('input[name="safesearch"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                document.getElementById('label-strict').textContent = 'Strict';
-                document.getElementById('label-moderate').textContent = 'Moderate';
-                document.getElementById('label-off').textContent = 'Off';
-                const selectedSpan = e.target.nextElementSibling;
-                selectedSpan.textContent = '✓ ' + selectedSpan.textContent;
-            });
+        // Check and apply stored disguise mode
+        const savedDisguise = sessionStorage.getItem('ghost_disguise') || 'ghost';
+        applyDisguise(savedDisguise);
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            document.getElementById('themeBtn').textContent = isLight ? '☀️' : '🌙';
+        }
+
+        function toggleDisguiseMenu() {
+            const menu = document.getElementById('disguiseMenu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Close disguise dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.disguise-dropdown') && !e.target.closest('button[onclick*="toggleDisguiseMenu"]')) {
+                document.getElementById('disguiseMenu').style.display = 'none';
+            }
         });
+
+        function applyDisguise(mode) {
+            sessionStorage.setItem('ghost_disguise', mode);
+            const titleEl = document.getElementById('page-title');
+            const faviconEl = document.getElementById('page-favicon');
+            const brandText = document.getElementById('nav-brand-text');
+
+            if (mode === 'google') {
+                titleEl.textContent = 'Google';
+                faviconEl.href = 'https://www.google.com/favicon.ico';
+                brandText.textContent = 'Google';
+            } else if (mode === 'newtab') {
+                titleEl.textContent = 'New Tab';
+                faviconEl.href = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%2394a3b8"/></svg>';
+                brandText.textContent = 'New Tab';
+            } else if (mode === 'wiki') {
+                titleEl.textContent = 'Wikipedia, the free encyclopedia';
+                faviconEl.href = 'https://en.wikipedia.org/static/favicon/wikipedia.ico';
+                brandText.textContent = 'Wikipedia';
+            } else {
+                titleEl.textContent = 'GhostSearch';
+                faviconEl.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>";
+                brandText.textContent = 'GhostSearch';
+            }
+            document.getElementById('disguiseMenu').style.display = 'none';
+        }
+
+        function syncSafeSearch(val) {
+            currentSafeSearch = val;
+            document.querySelectorAll(`input[name="safesearch"][value="${val}"]`).forEach(el => el.checked = true);
+            document.getElementById('currentSafeSearchBadge').textContent = `SafeSearch: ${val.charAt(0).toUpperCase() + val.slice(1)}`;
+        }
+
+        function resetToHome() {
+            document.getElementById('heroSection').style.display = 'flex';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('searchInputHero').value = '';
+            document.getElementById('searchInputResults').value = '';
+            currentQuery = '';
+            window.history.replaceState(null, '', '/');
+        }
+
+        // SINGLE-PAGE IN-PLACE SEARCH (Zero Browser History Navigation)
+        async function handleSearch(e) {
+            if (e) e.preventDefault();
+            
+            const heroInput = document.getElementById('searchInputHero');
+            const resultsInput = document.getElementById('searchInputResults');
+            const query = (heroInput.value || resultsInput.value || '').trim();
+            if (!query) return;
+
+            currentQuery = query;
+            heroInput.value = query;
+            resultsInput.value = query;
+
+            // Zero-History Guarantee: Replace history state so no /search URL is ever logged
+            window.history.replaceState(null, '', '/');
+
+            // Switch UI to Loading
+            document.getElementById('heroSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+
+            try {
+                const resp = await fetch(`/api/search?q=${encodeURIComponent(query)}&safesearch=${encodeURIComponent(currentSafeSearch)}`);
+                const data = await resp.json();
+                renderResults(data);
+            } catch (err) {
+                renderResults({ query: query, results: [], instant: null });
+            } finally {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('resultsSection').style.display = 'block';
+            }
+        }
+
+        function renderResults(data) {
+            const list = document.getElementById('resultsList');
+            const emptyState = document.getElementById('emptyState');
+            const instantBox = document.getElementById('instantBox');
+            const countBadge = document.getElementById('resultsCountBadge');
+
+            list.innerHTML = '';
+
+            // Handle Instant Answer
+            if (data.instant && data.instant.heading && data.instant.abstract) {
+                document.getElementById('instantTitle').textContent = data.instant.heading;
+                document.getElementById('instantAbstract').textContent = data.instant.abstract;
+                const link = document.getElementById('instantLink');
+                if (data.instant.url) {
+                    link.href = data.instant.url;
+                    link.style.display = 'inline';
+                    link.textContent = `Source: ${data.instant.source || 'Knowledge Base'}`;
+                } else {
+                    link.style.display = 'none';
+                }
+                instantBox.style.display = 'block';
+            } else {
+                instantBox.style.display = 'none';
+            }
+
+            // Handle Organic Results
+            const items = data.results || [];
+            countBadge.textContent = `${items.length} Organic Results`;
+
+            if (items.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
+
+                // Escape helper
+                const safeUrl = item.url.replace(/"/g, '&quot;');
+                const safeTitle = item.title.replace(/"/g, '&quot;');
+
+                itemDiv.innerHTML = `
+                    <div class="result-top-row">
+                        <a href="${safeUrl}" target="_blank" rel="noreferrer noopener" class="result-title">${item.title}</a>
+                        <button class="ghost-view-btn" onclick="openGhostView('${safeUrl}', '${safeTitle}')" title="Read anonymously without visiting the site">
+                            👁️ Ghost View
+                        </button>
+                    </div>
+                    <a href="${safeUrl}" target="_blank" rel="noreferrer noopener" class="result-url">${item.url}</a>
+                    <p class="result-snippet">${item.snippet || ''}</p>
+                `;
+                list.appendChild(itemDiv);
+            });
+        }
+
+        // GHOST VIEW (In-Page Anonymous Web Reader)
+        async function openGhostView(url, title) {
+            const modal = document.getElementById('readerModal');
+            const titleEl = document.getElementById('readerTitle');
+            const domainEl = document.getElementById('readerDomain');
+            const bodyEl = document.getElementById('readerParagraphs');
+
+            titleEl.textContent = title || 'Loading stealth view...';
+            domainEl.textContent = 'Extracting clean reader text via server proxy...';
+            bodyEl.innerHTML = '<div class="spinner" style="margin-top: 30px;"></div>';
+            modal.style.display = 'flex';
+
+            try {
+                const resp = await fetch(`/api/proxy?url=${encodeURIComponent(url)}`);
+                const data = await resp.json();
+
+                if (data.error) {
+                    bodyEl.innerHTML = `<p style="color: var(--danger-text);">Unable to extract reader view: ${data.error}</p><p><a href="${url}" target="_blank" rel="noreferrer noopener" style="color: var(--accent);">Open directly in new tab</a></p>`;
+                    return;
+                }
+
+                titleEl.textContent = data.title || title;
+                domainEl.innerHTML = `Source: <strong>${data.domain}</strong> &bull; Client-isolated read (Zero mobile history created)`;
+
+                if (!data.paragraphs || data.paragraphs.length === 0) {
+                    bodyEl.innerHTML = `<p>No readable article text extracted from this page.</p><p><a href="${url}" target="_blank" rel="noreferrer noopener" style="color: var(--accent);">Visit original page directly</a></p>`;
+                } else {
+                    bodyEl.innerHTML = data.paragraphs.map(p => `<p>${p}</p>`).join('');
+                }
+            } catch (err) {
+                bodyEl.innerHTML = `<p style="color: var(--danger-text);">Error fetching ghost view: ${err.message}</p>`;
+            }
+        }
+
+        function closeGhostView() {
+            document.getElementById('readerModal').style.display = 'none';
+        }
+
+        // EMERGENCY PANIC BUTTON (Overwrites history entry with Google)
+        function panicExit() {
+            try { fetch('/api/purge', { method: 'POST' }); } catch(e){}
+            document.body.innerHTML = '';
+            window.location.replace('https://www.google.com');
+        }
+
+        // WIPE SESSION
+        async function wipeSession() {
+            try { await fetch('/api/purge', { method: 'POST' }); } catch(e){}
+            resetToHome();
+        }
+
+        // Check if pre-rendered results exist (from direct POST /search fallback)
+        {% if results is not none and results|length > 0 %}
+        renderResults({
+            query: "{{ query }}",
+            results: {{ results | tojson }},
+            instant: {{ instant | tojson if instant else 'null' }}
+        });
+        document.getElementById('heroSection').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'block';
+        document.getElementById('searchInputResults').value = "{{ query }}";
+        {% endif %}
     </script>
 </body>
 </html>
