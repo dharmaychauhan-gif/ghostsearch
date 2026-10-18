@@ -6,6 +6,11 @@
     <!-- Default Disguise: Looks 100% like Google in Chrome History & Tab Switcher -->
     <title id="page-title">Google</title>
     <link rel="icon" id="page-favicon" href="https://www.google.com/favicon.ico">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0b1120">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="referrer" content="no-referrer">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -119,6 +124,11 @@
             border-color: var(--accent);
         }
 
+        .btn-install {
+            border-color: rgba(56, 189, 248, 0.4);
+            color: var(--accent);
+        }
+
         .btn-blank {
             background: #064e3b;
             color: #34d399;
@@ -195,7 +205,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 55vh;
+            min-height: 50vh;
             text-align: center;
             padding: 16px 0;
             transition: all 0.3s ease;
@@ -214,7 +224,7 @@
         .hero-subtitle {
             font-size: 0.9rem;
             color: var(--text-muted);
-            margin-bottom: 24px;
+            margin-bottom: 22px;
             max-width: 500px;
             line-height: 1.5;
         }
@@ -230,7 +240,41 @@
             border-radius: 20px;
             font-size: 0.78rem;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+        }
+
+        /* PWA Install Banner Card */
+        .pwa-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-top: 18px;
+            width: 100%;
+            max-width: 650px;
+            gap: 12px;
+        }
+
+        .pwa-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .pwa-btn {
+            background: var(--accent);
+            color: #0b1120;
+            border: none;
+            border-radius: 16px;
+            padding: 7px 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
         }
 
         /* Search Form */
@@ -469,7 +513,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Ghost Reader Modal */
+        /* Modals */
         .reader-modal {
             position: fixed;
             top: 0;
@@ -575,6 +619,11 @@
         </a>
 
         <div class="nav-actions">
+            <!-- 1-Tap App Install Button -->
+            <button class="btn-stealth btn-install" id="installBtn" onclick="triggerInstallApp()" title="Install GhostSearch as a private home screen app">
+                <span>📲</span> Install App
+            </button>
+
             <!-- 100% History-Bypass about:blank Tab Launcher -->
             <button class="btn-stealth btn-blank" onclick="launchBlankCloak()" title="Opens an about:blank tab which Chrome permanently excludes from Google History">
                 <span>🛡️</span> Ghost Tab
@@ -655,6 +704,15 @@
                     </label>
                 </div>
             </div>
+
+            <!-- Install PWA Banner -->
+            <div class="pwa-card" id="pwaCard">
+                <div class="pwa-text">
+                    <strong style="color: var(--text-main);">📲 Run as Standalone Private App:</strong><br>
+                    Opens outside Chrome tabs in its own window with zero history tracking.
+                </div>
+                <button class="pwa-btn" onclick="triggerInstallApp()">Install Now</button>
+            </div>
         </section>
 
         <!-- Loading State -->
@@ -734,6 +792,30 @@
         </div>
     </div>
 
+    <!-- PWA Install Guide Modal (If auto-prompt is blocked by mobile browser) -->
+    <div class="reader-modal" id="installHelpModal">
+        <div class="reader-content-box" style="max-width: 480px;">
+            <div class="reader-header">
+                <div class="reader-badge">
+                    <span>📲</span> How to Install on Your Phone
+                </div>
+                <button class="reader-close-btn" onclick="closeInstallHelp()">✕ Close</button>
+            </div>
+            <div class="reader-body" style="font-size: 0.95rem; line-height: 1.6;">
+                <p><strong>Step 1:</strong> In your mobile browser, tap the <strong>3 dots (⋮)</strong> icon at the top right corner.</p>
+                <p><strong>Step 2:</strong> Look for one of these options:</p>
+                <ul style="margin-left: 24px; margin-bottom: 16px;">
+                    <li><strong>"Install app"</strong> or <strong>"Install GhostSearch"</strong></li>
+                    <li><strong>"Add to Home screen"</strong></li>
+                    <li>If not directly visible: tap <strong>"Share"</strong>, then tap <strong>"Add to Home screen"</strong>.</li>
+                </ul>
+                <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px; margin-top: 14px; font-size: 0.85rem; color: var(--accent);">
+                    ✨ <strong>Why Install?</strong> Once installed, GhostSearch runs in its own private standalone window outside of Chrome's normal tabs, keeping your searches separated from Chrome history!
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
         Protected under strict zero-trace volatile RAM execution &bull; Disguised in Chrome History as Google
     </footer>
@@ -741,6 +823,39 @@
     <script>
         let currentSafeSearch = 'moderate';
         let currentQuery = '';
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+
+        // PWA Install Prompt Handler
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('installBtn');
+            if (btn) btn.style.display = 'inline-flex';
+        });
+
+        function triggerInstallApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        const card = document.getElementById('pwaCard');
+                        if (card) card.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                document.getElementById('installHelpModal').style.display = 'flex';
+            }
+        }
+
+        function closeInstallHelp() {
+            document.getElementById('installHelpModal').style.display = 'none';
+        }
 
         // Anti-History Guarantee: Ensure browser address bar never keeps /search in history
         if (window.location.pathname !== '/') {

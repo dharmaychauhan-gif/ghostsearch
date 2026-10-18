@@ -6,6 +6,7 @@ GhostSearch Application Server (Cloud & Local)
 - SafeSearch levels: Strict, Moderate, Off
 - SPA Search API (/api/search) for zero-history in-page searching
 - Ghost Reader Proxy (/api/proxy) for anonymous reading without visiting target sites
+- Full PWA Support (/manifest.json, /sw.js, icons) for 1-Tap Home Screen App Install
 """
 
 import gc
@@ -223,7 +224,7 @@ async def search_all(query: str, page: int = 1, safesearch: str = "moderate") ->
 APP_DIR = Path(__file__).resolve().parent
 ROOT_DIR = APP_DIR.parent
 
-# Smart template loader: dynamically chooses whichever index.html is the updated version
+# Smart template loader
 root_idx = ROOT_DIR / "index.html"
 app_idx = APP_DIR / "templates" / "index.html"
 
@@ -249,6 +250,57 @@ async def enforce_zero_storage_headers(request: Request, call_next):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     return response
+
+# PWA MANIFEST & SERVICE WORKER
+@app.get("/manifest.json")
+async def get_manifest():
+    return JSONResponse(
+        content={
+            "name": "GhostSearch",
+            "short_name": "GhostSearch",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#0b1120",
+            "theme_color": "#0b1120",
+            "description": "100% In-Memory Private Search Engine",
+            "icons": [
+                {
+                    "src": "/icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                },
+                {
+                    "src": "/icon-512.png",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                }
+            ]
+        },
+        headers={"Content-Type": "application/manifest+json"}
+    )
+
+@app.get("/sw.js")
+async def get_sw():
+    js_content = "self.addEventListener('install', (e) => { self.skipWaiting(); });\nself.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });\nself.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request)); });"
+    return Response(content=js_content, media_type="application/javascript")
+
+@app.get("/icon-192.png")
+async def get_icon_192():
+    for base in [ROOT_DIR, APP_DIR]:
+        p = base / "icon-192.png"
+        if p.exists():
+            return Response(content=p.read_bytes(), media_type="image/png")
+    return Response(status_code=404)
+
+@app.get("/icon-512.png")
+async def get_icon_512():
+    for base in [ROOT_DIR, APP_DIR]:
+        p = base / "icon-512.png"
+        if p.exists():
+            return Response(content=p.read_bytes(), media_type="image/png")
+    return Response(status_code=404)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
