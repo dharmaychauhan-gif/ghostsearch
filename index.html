@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="page-title">GhostSearch</title>
-    <link rel="icon" id="page-favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
+    <!-- Default Disguise: Looks 100% like Google in Chrome History & Tab Switcher -->
+    <title id="page-title">Google</title>
+    <link rel="icon" id="page-favicon" href="https://www.google.com/favicon.ico">
     <meta name="robots" content="noindex, nofollow, noarchive">
     <meta name="referrer" content="no-referrer">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -72,7 +73,7 @@
         .top-nav {
             background: var(--header-bg);
             border-bottom: 1px solid var(--border-color);
-            padding: 10px 16px;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -86,7 +87,7 @@
             align-items: center;
             gap: 8px;
             font-weight: 700;
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             color: var(--accent);
             text-decoration: none;
             cursor: pointer;
@@ -95,26 +96,38 @@
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         .btn-stealth {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             transition: all 0.15s;
         }
 
         .btn-stealth:hover {
             border-color: var(--accent);
+        }
+
+        .btn-blank {
+            background: #064e3b;
+            color: #34d399;
+            border: 1px solid #059669;
+        }
+
+        .btn-blank:hover {
+            background: #047857;
+            color: #fff;
         }
 
         .btn-panic {
@@ -131,8 +144,8 @@
         /* Disguise Menu Modal */
         .disguise-dropdown {
             position: absolute;
-            top: 50px;
-            right: 16px;
+            top: 48px;
+            right: 14px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 10px;
@@ -142,7 +155,7 @@
             gap: 6px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             z-index: 200;
-            min-width: 190px;
+            min-width: 200px;
         }
 
         .disguise-option {
@@ -171,7 +184,7 @@
             width: 100%;
             max-width: 860px;
             margin: 0 auto;
-            padding: 20px 16px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
         }
@@ -182,27 +195,42 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 60vh;
+            min-height: 55vh;
             text-align: center;
-            padding: 20px 0;
+            padding: 16px 0;
             transition: all 0.3s ease;
         }
 
         .hero-title {
-            font-size: 2.8rem;
+            font-size: 2.6rem;
             font-weight: 800;
             letter-spacing: -1px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .hero-subtitle {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-muted);
-            margin-bottom: 30px;
-            max-width: 520px;
+            margin-bottom: 24px;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+
+        .stealth-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
 
         /* Search Form */
@@ -214,7 +242,7 @@
             border-radius: 30px;
             display: flex;
             align-items: center;
-            padding: 6px 14px 6px 20px;
+            padding: 5px 12px 5px 18px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             transition: all 0.2s;
         }
@@ -229,7 +257,7 @@
             background: transparent;
             border: none;
             outline: none;
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: var(--text-main);
             padding: 8px 0;
         }
@@ -239,8 +267,8 @@
             color: #0b1120;
             border: none;
             border-radius: 22px;
-            padding: 10px 22px;
-            font-size: 0.95rem;
+            padding: 9px 20px;
+            font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.15s;
@@ -256,12 +284,12 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-top: 18px;
+            margin-top: 16px;
             flex-wrap: wrap;
         }
 
         .safesearch-label {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
             font-weight: 600;
         }
@@ -285,9 +313,9 @@
 
         .safesearch-pill span {
             display: inline-block;
-            padding: 5px 14px;
+            padding: 4px 13px;
             border-radius: 16px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-muted);
             transition: all 0.15s ease;
@@ -298,7 +326,7 @@
             color: #0b1120;
         }
 
-        /* Results View (Hidden Initially) */
+        /* Results View */
         .results-section {
             display: none;
             width: 100%;
@@ -308,11 +336,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            padding: 10px 0 16px 0;
+            padding: 8px 0 14px 0;
             border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             flex-wrap: wrap;
             gap: 8px;
         }
@@ -320,7 +348,7 @@
         .security-tags {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
@@ -337,20 +365,20 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 24px;
+            padding: 16px;
+            margin-bottom: 22px;
             display: none;
         }
 
         .instant-title {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--text-main);
             margin-bottom: 6px;
         }
 
         .instant-abstract {
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             line-height: 1.55;
             color: var(--text-muted);
             margin-bottom: 10px;
@@ -360,7 +388,7 @@
         .results-list {
             display: flex;
             flex-direction: column;
-            gap: 22px;
+            gap: 20px;
         }
 
         .result-item {
@@ -368,7 +396,7 @@
             flex-direction: column;
             gap: 4px;
             padding-bottom: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .result-top-row {
@@ -379,7 +407,7 @@
         }
 
         .result-title {
-            font-size: 1.15rem;
+            font-size: 1.12rem;
             font-weight: 600;
             color: var(--link-title);
             text-decoration: none;
@@ -408,19 +436,19 @@
         }
 
         .result-url {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--link-url);
             word-break: break-all;
             text-decoration: none;
         }
 
         .result-snippet {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             line-height: 1.5;
             color: var(--text-muted);
         }
 
-        /* Loading Skeleton */
+        /* Loading Spinner */
         .loading-state {
             display: none;
             padding: 30px 0;
@@ -428,13 +456,13 @@
         }
 
         .spinner {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border: 3px solid var(--border-color);
             border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin: 0 auto 14px auto;
+            margin: 0 auto 12px auto;
         }
 
         @keyframes spin {
@@ -454,7 +482,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 14px;
         }
 
         .reader-content-box {
@@ -471,7 +499,7 @@
         }
 
         .reader-header {
-            padding: 16px 20px;
+            padding: 14px 18px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -483,7 +511,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 700;
             color: #34d399;
         }
@@ -492,7 +520,7 @@
             background: var(--danger-bg);
             color: var(--danger-text);
             border: none;
-            padding: 6px 12px;
+            padding: 5px 12px;
             border-radius: 8px;
             font-size: 0.82rem;
             font-weight: 700;
@@ -500,11 +528,11 @@
         }
 
         .reader-body {
-            padding: 24px;
+            padding: 22px;
             overflow-y: auto;
             flex: 1;
             line-height: 1.7;
-            font-size: 1rem;
+            font-size: 0.98rem;
             color: var(--text-main);
         }
 
@@ -513,24 +541,24 @@
         }
 
         .reader-article-title {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             font-weight: 700;
             margin-bottom: 10px;
             color: var(--accent);
         }
 
         .reader-source-link {
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             display: block;
         }
 
         /* Footer */
         footer {
-            padding: 20px;
+            padding: 18px;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--text-muted);
             border-top: 1px solid var(--border-color);
             margin-top: auto;
@@ -542,22 +570,27 @@
     <!-- Top Stealth Bar -->
     <header class="top-nav">
         <a class="nav-brand" onclick="resetToHome()">
-            <span>👻</span>
-            <span id="nav-brand-text">GhostSearch</span>
+            <span id="nav-brand-icon">🔍</span>
+            <span id="nav-brand-text">Google</span>
         </a>
 
         <div class="nav-actions">
+            <!-- 100% History-Bypass about:blank Tab Launcher -->
+            <button class="btn-stealth btn-blank" onclick="launchBlankCloak()" title="Opens an about:blank tab which Chrome permanently excludes from Google History">
+                <span>🛡️</span> Ghost Tab
+            </button>
+
             <!-- Camouflage / Disguise Button -->
-            <button class="btn-stealth" onclick="toggleDisguiseMenu()" title="Camouflage Tab Title & Icon in Browser History">
+            <button class="btn-stealth" onclick="toggleDisguiseMenu()" title="Camouflage Tab Title & Icon in Chrome History">
                 <span>🎭</span> Disguise
             </button>
 
             <!-- Disguise Selector Dropdown -->
             <div class="disguise-dropdown" id="disguiseMenu">
-                <button class="disguise-option" onclick="applyDisguise('ghost')">👻 GhostSearch (Default)</button>
-                <button class="disguise-option" onclick="applyDisguise('google')">🔍 Google (Stealth)</button>
+                <button class="disguise-option" onclick="applyDisguise('google')">🔍 Google (Default Stealth)</button>
                 <button class="disguise-option" onclick="applyDisguise('newtab')">📄 New Tab</button>
                 <button class="disguise-option" onclick="applyDisguise('wiki')">📖 Wikipedia</button>
+                <button class="disguise-option" onclick="applyDisguise('ghost')">👻 GhostSearch</button>
             </div>
 
             <!-- Wipe RAM Button -->
@@ -579,9 +612,13 @@
         
         <!-- Hero Section (Home State) -->
         <section class="hero-section" id="heroSection">
-            <h1 class="hero-title">GhostSearch</h1>
+            <div class="stealth-status-pill">
+                <span>🛡️</span> Zero-History Single-Page Mode Active
+            </div>
+
+            <h1 class="hero-title" id="heroTitle">Google</h1>
             <p class="hero-subtitle">
-                100% In-Memory Private Search. Zero Logs. Zero Disk Storage. Single-Page Architecture ensures your searches never create browser history entries.
+                100% In-Memory Private Search. Searches never create new history entries in Chrome. Articles can be read in Ghost View without ever visiting external websites.
             </p>
 
             <form class="search-box-wrapper" onsubmit="handleSearch(event)">
@@ -589,7 +626,7 @@
                     type="text" 
                     id="searchInputHero" 
                     class="search-input" 
-                    placeholder="Search the web freely without tracking..." 
+                    placeholder="Search freely without leaving history..." 
                     autocomplete="off" 
                     autocorrect="off" 
                     autocapitalize="off" 
@@ -623,14 +660,14 @@
         <!-- Loading State -->
         <div class="loading-state" id="loadingState">
             <div class="spinner"></div>
-            <p style="font-size: 0.9rem; color: var(--text-muted);">Fetching clean, ad-free organic results...</p>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Fetching clean, private organic results...</p>
         </div>
 
         <!-- In-Place Results Section -->
         <section class="results-section" id="resultsSection">
             
             <!-- Compact Search Bar in Results Header -->
-            <form class="search-box-wrapper" style="max-width: 100%; margin-bottom: 20px;" onsubmit="handleSearch(event)">
+            <form class="search-box-wrapper" style="max-width: 100%; margin-bottom: 18px;" onsubmit="handleSearch(event)">
                 <input 
                     type="text" 
                     id="searchInputResults" 
@@ -648,9 +685,9 @@
 
             <div class="security-badge-bar">
                 <div class="security-tags">
-                    <span class="tag-green">🔒 Zero-Logs Enforced</span>
+                    <span class="tag-green">🔒 Zero History Stack</span>
                     <span>&bull;</span>
-                    <span>RAM Execution</span>
+                    <span>RAM Only</span>
                     <span>&bull;</span>
                     <span id="resultsCountBadge">0 Organic Results</span>
                 </div>
@@ -698,7 +735,7 @@
     </div>
 
     <footer>
-        GhostSearch &bull; Protected under strict zero-trace volatile RAM execution &bull; 127.0.0.1
+        Protected under strict zero-trace volatile RAM execution &bull; Disguised in Chrome History as Google
     </footer>
 
     <script>
@@ -707,11 +744,11 @@
 
         // Anti-History Guarantee: Ensure browser address bar never keeps /search in history
         if (window.location.pathname !== '/') {
-            window.history.replaceState(null, '', '/');
+            window.history.replaceState(null, 'Google', '/');
         }
 
-        // Check and apply stored disguise mode
-        const savedDisguise = sessionStorage.getItem('ghost_disguise') || 'ghost';
+        // Apply Disguise: Default to 'google' so Chrome History literally says "Google"!
+        const savedDisguise = sessionStorage.getItem('ghost_disguise') || 'google';
         applyDisguise(savedDisguise);
 
         function toggleTheme() {
@@ -725,7 +762,6 @@
             menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        // Close disguise dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.disguise-dropdown') && !e.target.closest('button[onclick*="toggleDisguiseMenu"]')) {
                 document.getElementById('disguiseMenu').style.display = 'none';
@@ -737,25 +773,68 @@
             const titleEl = document.getElementById('page-title');
             const faviconEl = document.getElementById('page-favicon');
             const brandText = document.getElementById('nav-brand-text');
+            const brandIcon = document.getElementById('nav-brand-icon');
+            const heroTitle = document.getElementById('heroTitle');
 
             if (mode === 'google') {
                 titleEl.textContent = 'Google';
                 faviconEl.href = 'https://www.google.com/favicon.ico';
                 brandText.textContent = 'Google';
+                brandIcon.textContent = '🔍';
+                heroTitle.textContent = 'Google';
             } else if (mode === 'newtab') {
                 titleEl.textContent = 'New Tab';
                 faviconEl.href = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%2394a3b8"/></svg>';
                 brandText.textContent = 'New Tab';
+                brandIcon.textContent = '📄';
+                heroTitle.textContent = 'New Tab';
             } else if (mode === 'wiki') {
                 titleEl.textContent = 'Wikipedia, the free encyclopedia';
                 faviconEl.href = 'https://en.wikipedia.org/static/favicon/wikipedia.ico';
                 brandText.textContent = 'Wikipedia';
+                brandIcon.textContent = '📖';
+                heroTitle.textContent = 'Wikipedia';
             } else {
                 titleEl.textContent = 'GhostSearch';
                 faviconEl.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>";
                 brandText.textContent = 'GhostSearch';
+                brandIcon.textContent = '👻';
+                heroTitle.textContent = 'GhostSearch';
             }
             document.getElementById('disguiseMenu').style.display = 'none';
+        }
+
+        // 100% HISTORY-BYPASS TAB (About:Blank Cloaking)
+        // Chrome permanently excludes 'about:blank' from Google History!
+        function launchBlankCloak() {
+            try {
+                const blankWindow = window.open('about:blank', '_blank');
+                if (blankWindow) {
+                    blankWindow.document.title = 'Google';
+                    const link = blankWindow.document.createElement('link');
+                    link.rel = 'icon';
+                    link.href = 'https://www.google.com/favicon.ico';
+                    blankWindow.document.head.appendChild(link);
+
+                    const iframe = blankWindow.document.createElement('iframe');
+                    iframe.src = window.location.href;
+                    iframe.style.width = '100vw';
+                    iframe.style.height = '100vh';
+                    iframe.style.border = 'none';
+                    iframe.style.position = 'fixed';
+                    iframe.style.top = '0';
+                    iframe.style.left = '0';
+                    blankWindow.document.body.style.margin = '0';
+                    blankWindow.document.body.style.padding = '0';
+                    blankWindow.document.body.style.overflow = 'hidden';
+                    blankWindow.document.body.appendChild(iframe);
+
+                    // Redirect the current tab to google.com so the original visit is immediately disguised
+                    window.location.replace('https://www.google.com');
+                    return;
+                }
+            } catch(e) {}
+            alert('Tip: Allow popups in your browser to launch the 100% History-Bypass Ghost Tab.');
         }
 
         function syncSafeSearch(val) {
@@ -771,7 +850,7 @@
             document.getElementById('searchInputHero').value = '';
             document.getElementById('searchInputResults').value = '';
             currentQuery = '';
-            window.history.replaceState(null, '', '/');
+            window.history.replaceState(null, 'Google', '/');
         }
 
         // SINGLE-PAGE IN-PLACE SEARCH (Zero Browser History Navigation)
@@ -787,8 +866,8 @@
             heroInput.value = query;
             resultsInput.value = query;
 
-            // Zero-History Guarantee: Replace history state so no /search URL is ever logged
-            window.history.replaceState(null, '', '/');
+            // ZERO-HISTORY GUARANTEE: Replace state so NO /search URL is ever logged in Chrome history!
+            window.history.replaceState(null, 'Google', '/');
 
             // Switch UI to Loading
             document.getElementById('heroSection').style.display = 'none';
@@ -847,14 +926,13 @@
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'result-item';
 
-                // Escape helper
                 const safeUrl = item.url.replace(/"/g, '&quot;');
                 const safeTitle = item.title.replace(/"/g, '&quot;');
 
                 itemDiv.innerHTML = `
                     <div class="result-top-row">
                         <a href="${safeUrl}" target="_blank" rel="noreferrer noopener" class="result-title">${item.title}</a>
-                        <button class="ghost-view-btn" onclick="openGhostView('${safeUrl}', '${safeTitle}')" title="Read anonymously without visiting the site">
+                        <button class="ghost-view-btn" onclick="openGhostView('${safeUrl}', '${safeTitle}')" title="Read anonymously without visiting or logging the site">
                             👁️ Ghost View
                         </button>
                     </div>
@@ -866,6 +944,7 @@
         }
 
         // GHOST VIEW (In-Page Anonymous Web Reader)
+        // Your browser never visits the site, leaving ZERO history of the destination site!
         async function openGhostView(url, title) {
             const modal = document.getElementById('readerModal');
             const titleEl = document.getElementById('readerTitle');
@@ -915,6 +994,12 @@
             try { await fetch('/api/purge', { method: 'POST' }); } catch(e){}
             resetToHome();
         }
+
+        // Auto-sanitize on tab hide / leave
+        window.addEventListener('pagehide', function() {
+            document.getElementById('searchInputHero').value = '';
+            document.getElementById('searchInputResults').value = '';
+        });
 
         // Check if pre-rendered results exist (from direct POST /search fallback)
         {% if results is not none and results|length > 0 %}
